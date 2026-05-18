@@ -27,7 +27,6 @@ ENV NODE_ENV=production
 # Copy only the necessary files from build stage
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package*.json ./
-COPY --from=build /app/firebase-applet-config.json ./
 
 # Install only production dependencies
 RUN npm install --omit=dev
