@@ -1,20 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Fiap - DevSecOps Agent - Challenge Zup
 
-# Run and deploy your AI Studio app
+## Grupo Kilo
 
-This contains everything you need to run your app locally.
+### Members
+- **Gabriel Sant Ana Pereira** – RM559796
+- **Leonardo Santos de Oliveira** – RM560288
+- **Leonardo Schroder** – RM558796
+- **Eduardo Servilieri** – RM560717
+- **Rodrigo Olivato Ribeiro** – RM559534
 
-View your app in AI Studio: https://ai.studio/apps/ce21f09c-c9f3-45c4-8d23-29a2f2ccb31a
+---
 
-## Run Locally
+## Project Overview
+Kilo Agent is an AI-powered code scanner designed to be integrated into GitHub Actions pipelines. It analyzes code changes (diffs) using Gemini AI to identify security vulnerabilities, focusing on OWASP Top 10 and common pitfalls.
 
-**Prerequisites:**  Node.js
+### Features
+- **Web Dashboard:** Visualize security findings across projects and branches.
+- **Pipeline Integration:** Automatically scan PRs and commits.
+- **AI Analysis:** Leverages Gemini Flash for fast and accurate vulnerability detection.
+- **Blocking PRs:** Prevents merging if High or Critical vulnerabilities are found.
 
+## Setup
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Environment Variables
+Configure the following in your environment or `.env` file:
+- `GEMINI_API_KEY`: Your Google GenAI API Key.
+- `SCAN_API_KEY`: A secret key for authenticating pipeline triggers.
+
+### Running Locally
+1. `npm install`
+2. `npm run dev`
+
+### Building for Production
+`npm run build`
