@@ -12,7 +12,7 @@ async function run() {
   const API_KEY = process.env.KILO_SCANNER_API_KEY;
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-  const prNumber = process.env.GITHUB_EVENT_PATH ? 
+  const prNumber = process.env.GITHUB_EVENT_PATH ?
     JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).number : null;
 
   if (!API_URL || !API_KEY) {
@@ -28,6 +28,9 @@ async function run() {
     // For PRs, compare with the base branch
     const baseRef = process.env.GITHUB_BASE_REF || "main";
     diff = execSync(`git diff origin/${baseRef}...HEAD`).toString();
+    if (diff === "") {
+      diff = execSync("git diff HEAD~1 HEAD").toString();
+    }
   } catch (e) {
     console.warn("⚠️ Failed to get diff via git. Falling back to simple diff.");
     diff = execSync("git diff HEAD~1 HEAD").toString();
@@ -35,7 +38,11 @@ async function run() {
 
   const commitInfo = execSync("git rev-parse HEAD").toString().trim();
   const author = execSync("git log -1 --pretty=format:'%an'").toString().trim();
-  const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
+  let branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
+
+  if (branch === "") {
+    branch = execSync("git branch --show-current").toString();
+  }
 
   try {
     const response = await fetch(`${API_URL}/api/scan`, {
@@ -65,44 +72,46 @@ async function run() {
     console.log(`✅ Scan completed. Scan ID: ${scanId}`);
     console.log(`📊 Found ${findings.length} issues.`);
 
+
+    let commentBody = `### 🛡️ Kilo DevSecOps AI Scan Results\n\n`;
+    commentBody += `**Execution ID:** [${scanId}](${API_URL}/scans/${scanId})\n`;
+
+    if (findings.length === 0) {
+      commentBody += `✅ **No vulnerabilities found.** Great job!\n`;
+    } else {
+      commentBody += `⚠️ **Found ${findings.length} total findings.**\n\n`;
+
+      const severityIcons = { Critical: "🔴", High: "🟠", Medium: "🟡", Low: "🔵" };
+
+      findings.forEach(f => {
+        commentBody += `- ${severityIcons[f.severity] || "⚪"} **${f.severity}**: \`${f.filePath}\` - ${f.description}\n`;
+      });
+
+      if (blocking) {
+        commentBody += `\n❌ **BLOCKING:** High or Critical vulnerabilities detected. Fix them to merge this PR.\n`;
+      }
+    }
+
+    commentBody += `\n---\n`;
+    commentBody += `#### 🏛️ About this Scan\n`;
+    commentBody += `**Fiap - DevSecOps Agent - Challenge Zup**\n`;
+    commentBody += `*Grupo Kilo*\n`;
+    commentBody += `- Gabriel Sant Ana Pereira – RM559796\n`;
+    commentBody += `- Leonardo Santos de Oliveira – RM560288\n`;
+    commentBody += `- Leonardo Schroder – RM558796\n`;
+    commentBody += `- Eduardo Servilieri – RM560717\n`;
+    commentBody += `- Rodrigo Olivato Ribeiro – RM559534\n`;
+
     if (GITHUB_TOKEN && prNumber) {
       const octokit = new Octokit({ auth: GITHUB_TOKEN });
-      
-      let commentBody = `### 🛡️ Kilo DevSecOps AI Scan Results\n\n`;
-      commentBody += `**Execution ID:** [${scanId}](${API_URL}/scans/${scanId})\n`;
-      
-      if (findings.length === 0) {
-        commentBody += `✅ **No vulnerabilities found.** Great job!\n`;
-      } else {
-        commentBody += `⚠️ **Found ${findings.length} total findings.**\n\n`;
-        
-        const severityIcons = { Critical: "🔴", High: "🟠", Medium: "🟡", Low: "🔵" };
-        
-        findings.forEach(f => {
-          commentBody += `- ${severityIcons[f.severity] || "⚪"} **${f.severity}**: \`${f.filePath}\` - ${f.description}\n`;
-        });
-
-        if (blocking) {
-          commentBody += `\n❌ **BLOCKING:** High or Critical vulnerabilities detected. Fix them to merge this PR.\n`;
-        }
-      }
-
-      commentBody += `\n---\n`;
-      commentBody += `#### 🏛️ About this Scan\n`;
-      commentBody += `**Fiap - DevSecOps Agent - Challenge Zup**\n`;
-      commentBody += `*Grupo Kilo*\n`;
-      commentBody += `- Gabriel Sant Ana Pereira – RM559796\n`;
-      commentBody += `- Leonardo Santos de Oliveira – RM560288\n`;
-      commentBody += `- Leonardo Schroder – RM558796\n`;
-      commentBody += `- Eduardo Servilieri – RM560717\n`;
-      commentBody += `- Rodrigo Olivato Ribeiro – RM559534\n`;
-
       await octokit.issues.createComment({
         owner,
         repo,
         issue_number: prNumber,
         body: commentBody,
       });
+    } else {
+      console.log(commentBody);
     }
 
     if (blocking) {
