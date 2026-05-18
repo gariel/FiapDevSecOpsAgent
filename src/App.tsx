@@ -15,7 +15,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/projects" element={<ProjectList />} />
-            <Route path="/projects/:owner/:repo/:branch" element={<ProjectDetail />} />
+            <Route path="/projects/:owner/:repo" element={<ProjectDetail />} />
             <Route path="/scans/:scanId" element={<ScanDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="*" element={<Navigate to="/" replace />} />

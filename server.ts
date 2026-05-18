@@ -171,12 +171,11 @@ async function startServer() {
       const seen = new Set();
 
       sortedScans.forEach((data: any) => {
-        const key = `${data.owner}/${data.repo}/${data.branch}`;
+        const key = `${data.owner}/${data.repo}`;
         if (!seen.has(key)) {
           projects.push({
             owner: data.owner,
             repo: data.repo,
-            branch: data.branch,
           });
           seen.add(key);
         }
@@ -185,6 +184,26 @@ async function startServer() {
     } catch (error) {
       console.error(`[${new Date().toISOString()}] Server Error: ${req.method} ${req.originalUrl} -`, error);
       res.status(500).json({ error: "Failed to fetch projects" });
+    }
+  });
+
+  app.get("/api/projects/:owner/:repo", async (req, res) => {
+    const { owner, repo } = req.params;
+    try {
+      const dbData = await readDB();
+      const scans = dbData.scans
+        .filter((scan: any) => scan.owner === owner && scan.repo === repo)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      const scansWithoutFindings = scans.map((scan: any) => {
+        const { findings, ...rest } = scan;
+        return rest;
+      });
+
+      res.json(scansWithoutFindings);
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Server Error: ${req.method} ${req.originalUrl} -`, error);
+      res.status(500).json({ error: "Failed to fetch scans" });
     }
   });
 

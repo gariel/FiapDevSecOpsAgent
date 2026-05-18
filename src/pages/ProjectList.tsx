@@ -45,7 +45,7 @@ export default function ProjectList() {
           projects.map((project, idx) => (
             <Link 
               key={idx}
-              to={`/projects/${project.owner}/${project.repo}/${project.branch}`}
+              to={`/projects/${project.owner}/${project.repo}`}
               className="group bg-zinc-950 border border-zinc-800 p-6 rounded-3xl hover:border-emerald-500/50 transition-all duration-300 relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -63,11 +63,8 @@ export default function ProjectList() {
               </div>
 
               <div className="flex items-center justify-between mt-8">
-                <div className="bg-zinc-900/50 px-3 py-1 rounded-full border border-zinc-800">
-                  <span className="text-zinc-400 text-xs font-mono uppercase tracking-widest">{project.branch}</span>
-                </div>
-                <div className="flex items-center gap-1 text-emerald-500 text-sm font-medium group-hover:translate-x-1 transition-transform">
-                  View Scans <ChevronRight className="w-4 h-4" />
+                <div className="flex items-center gap-1 text-emerald-500 text-sm font-medium group-hover:translate-x-1 transition-transform ml-auto">
+                  View Repository <ChevronRight className="w-4 h-4" />
                 </div>
               </div>
             </Link>

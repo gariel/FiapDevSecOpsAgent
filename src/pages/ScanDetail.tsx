@@ -60,7 +60,16 @@ export default function ScanDetail() {
             <span className="text-zinc-700 font-bold">/</span>
             <span className="text-emerald-500 font-mono text-xs">{scan.commitHash?.substring(0, 7)}</span>
             <span className="text-zinc-700 font-bold">•</span>
-            <span className="text-zinc-500">{new Date(scan.timestamp?._seconds * 1000).toLocaleString()}</span>
+            <span className="text-zinc-500">
+              {(() => {
+                if (!scan.timestamp) return "Unknown Date";
+                if (typeof scan.timestamp === "string") return new Date(scan.timestamp).toLocaleString();
+                if (typeof scan.timestamp === "object" && scan.timestamp._seconds) {
+                  return new Date(scan.timestamp._seconds * 1000).toLocaleString();
+                }
+                return new Date(scan.timestamp).toLocaleString();
+              })()}
+            </span>
           </div>
         </div>
       </header>
