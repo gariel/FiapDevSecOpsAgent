@@ -43,18 +43,6 @@ export default function About() {
         </div>
       </div>
 
-      <div className="bg-zinc-950 border border-zinc-800 p-8 rounded-3xl space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-          Mission Statement
-        </h2>
-        <p className="text-zinc-400 leading-relaxed font-serif text-lg">
-          Our mission is to empower developers with immediate security feedback directly in the CI/CD pipeline. 
-          By leveraging Gemini's generative AI capabilities, the Kilo Agent identifies complex vulnerabilities 
-          that traditional static analysis tools might miss, ensuring that security is not just a checkbox, 
-          but a foundational element of every commit.
-        </p>
-      </div>
     </motion.div>
   );
 }
