@@ -1,0 +1,32 @@
+name: Kilo DevSecOps AI Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  scan:
+    name: AI Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/checkout@v4
+        with:
+          node-version: 18
+
+      - name: Install Scan Dependencies
+        run: npm install @octokit/rest
+
+      - name: Run Kilo AI Scan
+        env:
+          KILO_SCANNER_API_URL: ${{ secrets.KILO_SCANNER_API_URL }}
+          KILO_SCANNER_API_KEY: ${{ secrets.KILO_SCANNER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/scanner.js

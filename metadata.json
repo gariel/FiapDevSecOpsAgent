@@ -1,0 +1,8 @@
+{
+  "name": "Fiap DevSecOps Agent",
+  "description": "AI-powered code scanner for GitHub Actions pipelines, featuring vulnerability detection and a quality dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
